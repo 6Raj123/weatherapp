@@ -13,5 +13,7 @@ By city ID
 By geographic coordinates
 By ZIP code
 
+To fix few issue's, which are identified.
+Use more Kotlin feature's
 
 
