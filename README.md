@@ -9,9 +9,7 @@ You will get 5 days temperature contains 3 hours format.
 
 Future  Scope:
 Get the weather based on below parameter:
-By city ID
-By geographic coordinates
-By ZIP code
+By city ID, By geographic coordinates, By ZIP code
 
 To fix few issue's, which are identified.
 Use more Kotlin feature's.
