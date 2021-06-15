@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="daily_forecast">Daily Forecast</string>
+    <string name="degree">\u2103</string>
+    <string name="city_name_hint">enter city name</string>
+</resources>
