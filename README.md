@@ -7,5 +7,11 @@ Temperature shows in celsius format.
 You will get 5 days temperature contains 3 hours format.
 
 
+Future  Scope:
+Get the weather based on below parameter:
+By city ID
+By geographic coordinates
+By ZIP code
+
 
 
