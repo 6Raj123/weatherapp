@@ -2,62 +2,38 @@ package com.raj.weather.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.raj.weather.model.DisplayWeatherList
 import com.raj.weather.model.ServerWeatherList
-import com.raj.weather.network.ApiService
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import retrofit2.HttpException
-import retrofit2.Retrofit
+import com.raj.weather.network.ApiHelper
+import com.raj.weather.utils.Resource
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
-class HomeActivityViewModel : ViewModel() {
 
-    var serverDataList: MutableLiveData<ServerWeatherList> = MutableLiveData()
-    var weatherError: MutableLiveData<String> = MutableLiveData()
+class HomeActivityViewModel(private val apiHelper: ApiHelper) : ViewModel() {
+
+    private var serverDataList: MutableLiveData<Resource<ServerWeatherList>> = MutableLiveData()
     val displayWeatherLists = MutableLiveData<List<DisplayWeatherList>>()
 
-    fun getServerDataListObserver(): MutableLiveData<ServerWeatherList> {
+    fun getServerDataListObserver(): MutableLiveData<Resource<ServerWeatherList>> {
         return serverDataList
     }
 
-    fun getWeatherErrorObserver(): MutableLiveData<String> {
-        return weatherError
-    }
-
-    fun makeApiCallForWeatherData(retrofit: Retrofit, query: String) {
-
-        retrofit.create(ApiService::class.java)
-        val retroInstance = retrofit.create(ApiService::class.java)
-        retroInstance.getWeatherList(query)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(getServerDataObserverRx())
-    }
-
-    private fun getServerDataObserverRx(): Observer<ServerWeatherList> {
-        return object : Observer<ServerWeatherList> {
-            override fun onComplete() {
-            }
-
-            override fun onError(e: Throwable) {
-                weatherError.postValue((e as HttpException).message())
-            }
-
-            override fun onNext(weatherList: ServerWeatherList) {
-                serverDataList.postValue(weatherList)
-            }
-
-            override fun onSubscribe(d: Disposable) {
+    fun fetchWeatherData(query: String) {
+        viewModelScope.launch {
+            serverDataList.postValue(Resource.loading(null))
+            try {
+                val weatherFromApi = apiHelper.getWeatherList(query)
+                serverDataList.postValue(Resource.success(weatherFromApi))
+            } catch (e: Exception) {
+                serverDataList.postValue(Resource.error(e.toString(), null))
             }
         }
     }
-
 
     fun convertToDisplayData(serverWeatherList: ServerWeatherList) {
         val weatherDisplayList = ArrayList<DisplayWeatherList>()
